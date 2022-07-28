@@ -1,6 +1,7 @@
+import { useNavigation } from "@react-navigation/native";
 import { format } from "date-fns";
 import { View, StyleSheet, FlatList } from "react-native";
-import { List } from "react-native-paper";
+import { FAB, List } from "react-native-paper";
 
 const memos = [
   { text: "メモメモメモ", createdAt: 1658971800000 },
@@ -14,6 +15,10 @@ const memos = [
 ];
 
 export const MainScreen = () => {
+  const navigation = useNavigation();
+  const onPressAdd = () => {
+    navigation.navigate("Compose");
+  };
   return (
     <View style={styles.container}>
       <FlatList
@@ -31,6 +36,15 @@ export const MainScreen = () => {
             descriptionStyle={{ textAlign: "right" }}
           />
         )}
+      />
+      <FAB
+        style={{
+          position: "absolute",
+          right: 16,
+          bottom: 16,
+        }}
+        icon="plus"
+        onPress={onPressAdd}
       />
     </View>
   );
