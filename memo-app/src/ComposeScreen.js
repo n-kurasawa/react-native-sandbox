@@ -1,17 +1,37 @@
-import { StyleSheet, View, Text } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { useState } from "react";
+import { StyleSheet, KeyboardAvoidingView } from "react-native";
+import { Button, TextInput } from "react-native-paper";
+import { save } from "./store";
 
 export const ComposeScreen = () => {
+  const [text, setText] = useState("");
+  const navigation = useNavigation();
+  const onPressSave = async () => {
+    await save(text, Date.now());
+    navigation.goBack();
+  };
   return (
-    <View style={styles.container}>
-      <Text>メモ作成画面</Text>
-    </View>
+    <KeyboardAvoidingView style={styles.container}>
+      <TextInput
+        style={{ marginBottom: 16 }}
+        mode="outlined"
+        placeholder="メモを入力してください"
+        multiline
+        onChangeText={(text) => {
+          setText(text);
+        }}
+      />
+      <Button mode="contained" onPress={onPressSave}>
+        保存
+      </Button>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
+    padding: 16,
   },
 });
