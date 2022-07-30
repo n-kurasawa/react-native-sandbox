@@ -1,10 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  SafeAreaView,
+  View,
+  TouchableOpacity,
+  Image,
+} from "react-native";
 import { Camera, CameraType } from "expo-camera";
+import { Ionicons } from "@expo/vector-icons";
+import * as MediaLibrary from "expo-media-library";
 
 export default function App() {
   const [hasPermission, setHasPermission] = useState(null);
   const [type, setType] = useState(CameraType.back);
+  const [camera, setCamera] = useState(null);
+  const [picture, setPicture] = useState(null);
 
   useEffect(() => {
     (async () => {
@@ -19,23 +30,52 @@ export default function App() {
   if (hasPermission === false) {
     return <Text>No access to camera</Text>;
   }
+
+  const takePicture = async () => {
+    if (camera) {
+      const image = await camera.takePictureAsync();
+      setPicture(image.uri);
+      const { status } = await MediaLibrary.requestPermissionsAsync();
+      if (status === "granted") {
+        const asset = await MediaLibrary.createAssetAsync(image.uri);
+      }
+    }
+  };
+
   return (
-    <View style={styles.container}>
-      <Camera style={styles.camera} type={type}>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => {
-              setType(
-                type === CameraType.back ? CameraType.front : CameraType.back
-              );
+    <SafeAreaView style={styles.container}>
+      <View style={{ flex: 1 }}>
+        {picture ? (
+          <Image source={{ uri: picture }} style={{ flex: 1 }} />
+        ) : (
+          <Camera
+            type={type}
+            style={{ flex: 1 }}
+            ref={(ref) => {
+              setCamera(ref);
             }}
-          >
-            <Text style={styles.text}> Flip </Text>
+          />
+        )}
+      </View>
+      <View style={styles.buttonContainer}>
+        {picture ? (
+          <TouchableOpacity onPress={() => setPicture(null)}>
+            <Ionicons name="ios-camera-outline" size={40} color="black" />
           </TouchableOpacity>
-        </View>
-      </Camera>
-    </View>
+        ) : (
+          <TouchableOpacity style={styles.cameraButton} onPress={takePicture} />
+        )}
+        <TouchableOpacity
+          onPress={() => {
+            setType(
+              type === CameraType.back ? CameraType.front : CameraType.back
+            );
+          }}
+        >
+          <Ionicons name="ios-camera-reverse-sharp" size={40} color="black" />
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
   );
 }
 
@@ -47,18 +87,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   buttonContainer: {
-    flex: 1,
-    backgroundColor: "transparent",
-    flexDirection: "row",
-    margin: 20,
-  },
-  button: {
-    flex: 0.1,
-    alignSelf: "flex-end",
+    height: 60,
+    justifyContent: "space-evenly",
     alignItems: "center",
+    flexDirection: "row",
   },
-  text: {
-    fontSize: 18,
-    color: "white",
+  cameraButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 50,
+    borderWidth: 5,
+    borderColor: "black",
   },
 });
