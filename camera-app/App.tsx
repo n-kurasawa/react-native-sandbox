@@ -11,6 +11,8 @@ import { Camera, CameraType } from "expo-camera";
 import { Ionicons } from "@expo/vector-icons";
 import * as MediaLibrary from "expo-media-library";
 
+const ALUBUM_NAME = "develop";
+
 export default function App() {
   const [hasPermission, setHasPermission] = useState(null);
   const [type, setType] = useState(CameraType.back);
@@ -37,7 +39,13 @@ export default function App() {
       setPicture(image.uri);
       const { status } = await MediaLibrary.requestPermissionsAsync();
       if (status === "granted") {
+        const album = await MediaLibrary.getAlbumAsync(ALUBUM_NAME);
         const asset = await MediaLibrary.createAssetAsync(image.uri);
+        if (album) {
+          await MediaLibrary.addAssetsToAlbumAsync(asset, album, false);
+        } else {
+          await MediaLibrary.createAlbumAsync(ALUBUM_NAME, asset, false);
+        }
       }
     }
   };
