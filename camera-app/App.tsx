@@ -18,6 +18,7 @@ export default function App() {
   const [type, setType] = useState(CameraType.back);
   const [camera, setCamera] = useState(null);
   const [picture, setPicture] = useState(null);
+  const [isCameraReady, setCameraReady] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -25,6 +26,10 @@ export default function App() {
       setHasPermission(status === "granted");
     })();
   }, []);
+
+  const onCameraReady = () => {
+    setCameraReady(true);
+  };
 
   if (hasPermission === null) {
     return <View />;
@@ -62,6 +67,7 @@ export default function App() {
             ref={(ref) => {
               setCamera(ref);
             }}
+            onCameraReady={onCameraReady}
           />
         )}
       </View>
@@ -71,7 +77,11 @@ export default function App() {
             <Ionicons name="ios-camera-outline" size={40} color="black" />
           </TouchableOpacity>
         ) : (
-          <TouchableOpacity style={styles.cameraButton} onPress={takePicture} />
+          <TouchableOpacity
+            disabled={isCameraReady}
+            style={styles.cameraButton}
+            onPress={takePicture}
+          />
         )}
         <TouchableOpacity
           onPress={() => {
