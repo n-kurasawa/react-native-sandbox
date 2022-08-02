@@ -78,7 +78,7 @@ export default function App() {
           </TouchableOpacity>
         ) : (
           <TouchableOpacity
-            disabled={isCameraReady}
+            disabled={!isCameraReady}
             style={styles.cameraButton}
             onPress={takePicture}
           />
